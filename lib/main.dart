@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:test_mini_app/webview_event_controller.dart';
 import 'package:test_mini_app/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey webViewKey = GlobalKey();
+  WebviewEventController? eventWebviewController = null;
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
@@ -67,29 +69,31 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(title: const Text("Official InAppWebView website")),
         body: SafeArea(
             child: Column(children: <Widget>[
-          TextField(
-            decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-            controller: urlController,
-            keyboardType: TextInputType.url,
-            onSubmitted: (value) {
-              var url = WebUri(value);
-              if (url.scheme.isEmpty) {
-                url = WebUri("https://www.google.com/search?q=$value");
-              }
-              webViewController?.loadUrl(urlRequest: URLRequest(url: url));
-            },
-          ),
+          // TextField(
+          //   decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+          //   controller: urlController,
+          //   keyboardType: TextInputType.url,
+          //   onSubmitted: (value) {
+          //     var url = WebUri(value);
+          //     if (url.scheme.isEmpty) {
+          //       url = WebUri("https://www.google.com/search?q=$value");
+          //     }
+          //     webViewController?.loadUrl(urlRequest: URLRequest(url: url));
+          //   },
+          // ),
           Expanded(
             child: Stack(
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  initialUrlRequest: URLRequest(
-                      url: WebUri("https://test-mini-app-two.vercel.app/")),
+                  initialUrlRequest:
+                      URLRequest(url: WebUri("https://mini-duyn.vercel.app/")),
                   initialSettings: settings,
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) {
                     webViewController = controller;
+                    eventWebviewController =
+                        WebviewEventController(controller: controller);
                   },
                   onLoadStart: (controller, url) {
                     setState(() {
@@ -170,13 +174,15 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 child: const Icon(Icons.account_box),
                 onPressed: () {
-                  webViewController?.goBack();
+                  eventWebviewController!.call(name: "test", params: null);
                 },
               ),
               ElevatedButton(
-                child: const Icon(Icons.arrow_forward),
+                child: const Icon(Icons.abc),
                 onPressed: () {
-                  webViewController?.goForward();
+                  eventWebviewController!
+                      .call(name: "test-params", params: null);
+                  // webViewController?.goForward();
                 },
               ),
               ElevatedButton(
