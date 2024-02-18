@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:test_mini_app/webview_event_controller.dart';
 import 'package:test_mini_app/webview_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final GlobalKey webViewKey = GlobalKey();
-  WebviewEventController? eventWebviewController = null;
+  WebviewEventController eventWebviewController = WebviewEventController();
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
@@ -63,24 +64,26 @@ class _MyAppState extends State<MyApp> {
           );
   }
 
+  void updateEvent() {
+    eventWebviewController.listHandle.map((e) => {
+          webViewController!.addJavaScriptHandler(
+            handlerName: e.name,
+            callback: e.callback,
+          )
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
+    eventWebviewController.registerHandle(
+        name: "call_handle",
+        callback: (args) {
+          Fluttertoast.showToast(msg: args.toString());
+        });
     return Scaffold(
         appBar: AppBar(title: const Text("Official InAppWebView website")),
         body: SafeArea(
             child: Column(children: <Widget>[
-          // TextField(
-          //   decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
-          //   controller: urlController,
-          //   keyboardType: TextInputType.url,
-          //   onSubmitted: (value) {
-          //     var url = WebUri(value);
-          //     if (url.scheme.isEmpty) {
-          //       url = WebUri("https://www.google.com/search?q=$value");
-          //     }
-          //     webViewController?.loadUrl(urlRequest: URLRequest(url: url));
-          //   },
-          // ),
           Expanded(
             child: Stack(
               children: [
@@ -92,8 +95,8 @@ class _MyAppState extends State<MyApp> {
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) {
                     webViewController = controller;
-                    eventWebviewController =
-                        WebviewEventController(controller: controller);
+                    eventWebviewController.controller = controller;
+                    eventWebviewController.initHandle();
                   },
                   onLoadStart: (controller, url) {
                     setState(() {
@@ -174,14 +177,21 @@ class _MyAppState extends State<MyApp> {
               ElevatedButton(
                 child: const Icon(Icons.account_box),
                 onPressed: () {
-                  eventWebviewController!.call(name: "test", params: null);
+                  eventWebviewController.call(
+                    name: "test",
+                    params: null,
+                    controller: webViewController,
+                  );
                 },
               ),
               ElevatedButton(
                 child: const Icon(Icons.abc),
                 onPressed: () {
-                  eventWebviewController!
-                      .call(name: "test-params", params: null);
+                  eventWebviewController.call(
+                    name: "test-params",
+                    params: null,
+                    controller: webViewController,
+                  );
                   // webViewController?.goForward();
                 },
               ),
@@ -189,6 +199,7 @@ class _MyAppState extends State<MyApp> {
                 child: const Icon(Icons.refresh),
                 onPressed: () {
                   webViewController?.reload();
+                  Fluttertoast.showToast(msg: "hello");
                 },
               ),
             ],
