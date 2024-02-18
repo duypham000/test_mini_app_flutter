@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class WebviewEventController {
   WebviewEventController(
@@ -11,7 +12,13 @@ class WebviewEventController {
 
   InAppWebViewController? controller;
 
-  List<JavascriptHandle> listHandle = [];
+  List<JavascriptHandle> listHandle = [
+    JavascriptHandle(
+        name: "JsToNative_toast",
+        callback: (args) {
+          Fluttertoast.showToast(msg: args.toString());
+        })
+  ];
 
   call({required name, required params, required controller}) {
     // print('EventController.call({name: "' + name + ' ",})');

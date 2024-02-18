@@ -64,22 +64,13 @@ class _MyAppState extends State<MyApp> {
           );
   }
 
-  void updateEvent() {
-    eventWebviewController.listHandle.map((e) => {
-          webViewController!.addJavaScriptHandler(
-            handlerName: e.name,
-            callback: e.callback,
-          )
-        });
-  }
-
   @override
   Widget build(BuildContext context) {
-    eventWebviewController.registerHandle(
-        name: "call_handle",
-        callback: (args) {
-          Fluttertoast.showToast(msg: args.toString());
-        });
+    // eventWebviewController.registerHandle(
+    //     name: "call_handle",
+    //     callback: (args) {
+    //       Fluttertoast.showToast(msg: args.toString());
+    //     });
     return Scaffold(
         appBar: AppBar(title: const Text("Official InAppWebView website")),
         body: SafeArea(
