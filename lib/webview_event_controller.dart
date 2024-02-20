@@ -14,17 +14,17 @@ class WebviewEventController {
 
   List<JavascriptHandle> listHandle = [
     JavascriptHandle(
-        name: "JsToNative_toast",
-        callback: (args) {
-          Fluttertoast.showToast(msg: args.toString());
-        })
+      name: "JsToNative_toast",
+      callback: (args) {
+        Fluttertoast.showToast(msg: args[0].toString());
+      },
+    ),
   ];
 
   call({required name, required params, required controller}) {
     // print('EventController.call({name: "' + name + ' ",})');
     if (controller == null) return;
-    var param = {'text': 'hello', 'num': 123, 'db': 1.25};
-    var res = json.encode(param);
+    var res = json.encode(params);
     var req =
         'EventController.call({name: "' + name + '", params: ' + res + '})';
     controller!.callAsyncJavaScript(
